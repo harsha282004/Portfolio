@@ -56,7 +56,7 @@ function AchievementBadge({ item, delay }) {
   return (
     <motion.article
       ref={ref}
-      initial={{ opacity: 0, y: 24 }}
+      initial={reduced ? false : { opacity: 0, y: 24 }}
       animate={inView ? { opacity: 1, y: 0 } : undefined}
       transition={{ duration: 0.7, delay, ease: EASE }}
       data-unlocked={unlocked || undefined}
@@ -66,7 +66,7 @@ function AchievementBadge({ item, delay }) {
 
       {/* status bar */}
       <div className="flex items-center justify-between gap-3 border-b border-hud-line-strong bg-white/[0.02] px-5 py-3 md:px-6">
-        <span className="hud-label flex items-center gap-2 text-ink-mute transition-colors group-data-[unlocked]:text-hud">
+        <span className="hud-label flex items-center gap-2 text-ink-mute">
           {unlocked ? (
             <>
               <Check aria-hidden className="h-3.5 w-3.5 text-hud" />

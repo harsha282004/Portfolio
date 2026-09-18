@@ -20,7 +20,8 @@ module.exports = {
       },
       extend: {
         fontFamily: {
-          hud: ['JetBrains Mono', 'ui-monospace', 'SFMono-Regular', 'monospace'],
+          sans: ['var(--font-inter)', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+          hud: ['var(--font-mono)', 'ui-monospace', 'SFMono-Regular', 'monospace'],
         },
         colors: {
           // HUD palette — see globals.css for the token definitions. The

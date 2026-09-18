@@ -45,13 +45,19 @@ export default function Navbar() {
 
   useEffect(() => {
     document.body.style.overflow = open ? 'hidden' : '';
+    // Lenis handles the wheel itself; pause it so the page can't move under
+    // the open menu.
+    if (open) window.__lenis?.stop();
     return () => {
       document.body.style.overflow = '';
+      window.__lenis?.start();
     };
   }, [open]);
 
   const handleNav = (e, href) => {
     setOpen(false);
+    // Resume Lenis now (it is paused while the menu is open) so the jump runs.
+    window.__lenis?.start();
     handleAnchorClick(e, href);
   };
 

@@ -1,13 +1,10 @@
 const nextConfig = {
   output: 'standalone',
+  // Images go through the Next.js optimizer (resized, AVIF/WebP) instead of
+  // shipping the multi-megabyte source PNGs.
   images: {
-    unoptimized: true,
-    remotePatterns: [
-      { protocol: 'https', hostname: 'avatars.githubusercontent.com', pathname: '/**' },
-    ],
+    formats: ['image/avif', 'image/webp'],
   },
-  // Renamed from experimental.serverComponentsExternalPackages in Next 15
-  serverExternalPackages: ['mongodb'],
   webpack(config, { dev }) {
     if (dev) {
       // Reduce CPU/memory from file watching
@@ -26,13 +23,11 @@ const nextConfig = {
   async headers() {
     return [
       {
-        source: "/(.*)",
+        source: '/(.*)',
         headers: [
-          { key: "X-Frame-Options", value: "ALLOWALL" },
-          { key: "Content-Security-Policy", value: "frame-ancestors *;" },
-          { key: "Access-Control-Allow-Origin", value: process.env.CORS_ORIGINS || "*" },
-          { key: "Access-Control-Allow-Methods", value: "GET, POST, PUT, DELETE, OPTIONS" },
-          { key: "Access-Control-Allow-Headers", value: "*" },
+          { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
         ],
       },
     ];

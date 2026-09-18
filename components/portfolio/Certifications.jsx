@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import * as Dialog from '@radix-ui/react-dialog';
 import { Linkedin, ShieldCheck, Maximize2, X, ArrowUpRight } from 'lucide-react';
@@ -20,6 +20,14 @@ export default function Certifications() {
   const c = certifications;
   const [open, setOpen] = useState(null); // cert id | null
   const current = c.items.find((x) => x.id === open);
+
+  // Lenis drives wheel scrolling itself, so the dialog's scroll lock alone
+  // would let the page move underneath. Pause it while the viewer is open.
+  useEffect(() => {
+    if (!open) return;
+    window.__lenis?.stop();
+    return () => window.__lenis?.start();
+  }, [open]);
 
   return (
     <SectionShell id="certifications" surface="void" grid="plain">

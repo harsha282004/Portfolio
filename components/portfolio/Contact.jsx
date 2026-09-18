@@ -18,15 +18,16 @@ const CONTACTS = [
 
 /**
  * Contact — ESTABLISH CONNECTION
- * A contact terminal. Client-side validated with NO backend: on a valid submit
- * it honestly reports that the form isn't connected yet and points to email /
- * LinkedIn. Structured so a service can be wired in later.
+ * A contact terminal. Client-side validated with NO backend: a valid submit
+ * opens the visitor's email app with the message pre-filled (mailto), and the
+ * status note gives the address directly in case no mail app is set up.
+ * Structured so a delivery service can be wired in later.
  */
 export default function Contact() {
   const c = contactSection;
   const [form, setForm] = useState({ name: '', email: '', message: '' });
   const [errors, setErrors] = useState({});
-  const [status, setStatus] = useState('idle'); // idle | loading | notice
+  const [status, setStatus] = useState('idle'); // idle | notice
 
   const update = (field) => (e) => {
     setForm((f) => ({ ...f, [field]: e.target.value }));
@@ -48,9 +49,14 @@ export default function Contact() {
     const next = validate();
     setErrors(next);
     if (Object.keys(next).length > 0) return;
-    // No contact service is configured — do not claim delivery.
-    setStatus('loading');
-    setTimeout(() => setStatus('notice'), 600);
+    // No delivery service is configured: hand the message to the visitor's
+    // own email app instead of claiming it was sent.
+    const subject = `Portfolio enquiry from ${form.name.trim()}`;
+    const body = `${form.message.trim()}
+
+— ${form.name.trim()} (${form.email.trim()})`;
+    window.location.href = `${profile.emailHref}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    setStatus('notice');
   };
 
   const fieldClass = (err) =>
@@ -171,13 +177,9 @@ export default function Contact() {
                 )}
               </div>
 
-              <button
-                type="submit"
-                disabled={status === 'loading'}
-                className="hud-btn mt-7 w-full justify-center disabled:opacity-70"
-              >
+              <button type="submit" className="hud-btn mt-7 w-full justify-center">
                 <Send className="h-3.5 w-3.5" aria-hidden />
-                {status === 'loading' ? 'Sending…' : 'Send Message'}
+                Send Message
               </button>
 
               {status === 'notice' && (
@@ -185,8 +187,8 @@ export default function Contact() {
                   role="status"
                   className="mt-5 border border-hud/30 bg-hud/[0.06] px-4 py-4 text-[13px] leading-relaxed text-ink-dim"
                 >
-                  Thanks{form.name ? `, ${form.name.trim()}` : ''}! This form isn&apos;t connected
-                  to a messaging service yet, so nothing was sent. Please reach me directly at{' '}
+                  Thanks{form.name ? `, ${form.name.trim()}` : ''}! Your email app should open with
+                  the message ready — just press send. If it didn&apos;t open, reach me directly at{' '}
                   <a
                     href={profile.emailHref}
                     className="text-hud-bright underline underline-offset-2 hover:text-white"

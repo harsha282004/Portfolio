@@ -23,6 +23,12 @@ import BootSequence from '@/components/portfolio/BootSequence';
 function App() {
   return (
     <SmoothScroll>
+      <a
+        href="#about"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[400] focus:bg-hud focus:px-4 focus:py-2 focus:font-hud focus:text-xs focus:uppercase focus:tracking-[0.2em] focus:text-void"
+      >
+        Skip to content
+      </a>
       <main className="relative min-h-screen w-full overflow-x-clip bg-void text-ink">
         <Navbar />
         <Hero />
