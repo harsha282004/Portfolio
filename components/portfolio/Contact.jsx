@@ -1,8 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { Mail, Phone, Linkedin, Github } from 'lucide-react';
+import { Mail, Phone, Linkedin, Github, Send } from 'lucide-react';
 import Reveal from './Reveal';
+import SectionShell from './hud/SectionShell';
+import HudHeading from './hud/HudHeading';
 import { contactSection, profile } from '@/lib/data/site';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -15,10 +17,10 @@ const CONTACTS = [
 ];
 
 /**
- * Contact
- * Dark closing section. Client-side validated form with NO backend: on a valid
- * submit it honestly tells the visitor the form isn't connected yet and points
- * them to email / LinkedIn. Structured so a service can be wired in later.
+ * Contact — ESTABLISH CONNECTION
+ * A contact terminal. Client-side validated with NO backend: on a valid submit
+ * it honestly reports that the form isn't connected yet and points to email /
+ * LinkedIn. Structured so a service can be wired in later.
  */
 export default function Contact() {
   const c = contactSection;
@@ -52,60 +54,38 @@ export default function Contact() {
   };
 
   const fieldClass = (err) =>
-    `mt-2 w-full rounded-md border bg-white/[0.03] px-4 py-3 text-[15px] text-[#f5f3ee] placeholder-white/25 outline-none transition-colors duration-200 focus:border-[#6cb6e6] focus-visible:border-[#6cb6e6] ${
-      err ? 'border-[#e0888a]' : 'border-white/15'
+    `mt-2 w-full border bg-white/[0.03] px-4 py-3 font-hud text-[13px] text-ink placeholder-ink-mute outline-none transition-colors duration-200 focus:border-hud focus-visible:border-hud ${
+      err ? 'border-red-400/60' : 'border-hud-line-strong'
     }`;
 
   return (
-    <section
-      id="contact"
-      className="relative w-full overflow-hidden bg-[#08080a] text-[#f5f3ee]"
-    >
-      {/* light Resume receding into the dark closing section */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 h-[50vh]"
-        style={{
-          background:
-            'linear-gradient(to bottom, #faf9f6 0%, rgba(250,249,246,0.5) 24%, rgba(8,8,10,0) 100%)',
-        }}
-      />
-
-      <div className="relative mx-auto grid w-full max-w-[1400px] gap-14 px-6 pb-40 pt-[40vh] md:grid-cols-2 md:gap-20 md:px-10 md:pb-52">
-        {/* Left — statement + contact info */}
+    <SectionShell id="contact" surface="void" grid="plain" scanlines glow="top">
+      <div className="grid gap-12 md:grid-cols-2 md:gap-20">
+        {/* ---------- left: statement + channels ---------- */}
         <div>
-          <Reveal as="p" className="about-eyebrow">
-            <span className="mr-3 inline-block h-px w-8 align-middle bg-[#6cb6e6]" />
-            {c.eyebrow}
-          </Reveal>
-          <Reveal
-            as="h2"
-            delay={0.05}
-            className="mt-8 font-display text-[clamp(2.5rem,6vw,5.5rem)] font-bold uppercase leading-[0.95] tracking-[-0.03em]"
-          >
-            {c.heading}
-          </Reveal>
-          <Reveal as="p" delay={0.12} className="mt-6 max-w-md text-base leading-relaxed text-[#8f8f97] md:text-lg">
-            {c.supporting}
-          </Reveal>
+          <HudHeading index="11" label={c.eyebrow} heading={c.heading} supporting={c.supporting} />
 
-          <div className="mt-12 grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="mt-10 grid grid-cols-1 gap-3 sm:grid-cols-2">
             {CONTACTS.map((item, i) => {
               const Icon = item.icon;
               const ext = item.external
-                ? { target: '_blank', rel: 'noopener noreferrer', 'aria-label': `${item.label} — opens in a new tab` }
+                ? {
+                    target: '_blank',
+                    rel: 'noopener noreferrer',
+                    'aria-label': `${item.label} — opens in a new tab`,
+                  }
                 : { 'aria-label': `${item.label}: ${item.value}` };
               return (
                 <Reveal key={item.label} delay={0.05 * i}>
                   <a
                     href={item.href}
                     {...ext}
-                    className="group flex items-center gap-3 rounded-lg border border-white/12 bg-white/[0.02] px-5 py-4 transition-colors duration-300 hover:border-[#6cb6e6]"
+                    className="hud-corners hud-panel hud-panel-hover group relative flex items-center gap-3 px-5 py-4"
                   >
-                    <Icon className="h-5 w-5 flex-none text-[#6cb6e6]" aria-hidden />
+                    <Icon className="h-5 w-5 flex-none text-hud" aria-hidden />
                     <div className="min-w-0">
-                      <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-white/40">{item.label}</p>
-                      <p className="truncate text-sm text-white/80 transition-colors duration-300 group-hover:text-white">
+                      <p className="hud-label">{item.label}</p>
+                      <p className="mt-1 truncate font-hud text-[13px] text-ink-dim transition-colors duration-300 group-hover:text-ink">
                         {item.value}
                       </p>
                     </div>
@@ -116,93 +96,119 @@ export default function Contact() {
           </div>
         </div>
 
-        {/* Right — form */}
+        {/* ---------- right: transmission terminal ---------- */}
         <Reveal delay={0.1}>
-          <form noValidate onSubmit={onSubmit} className="rounded-xl border border-white/12 bg-white/[0.02] p-6 md:p-8">
-            <div>
-              <label htmlFor="contact-name" className="font-mono text-[11px] uppercase tracking-[0.16em] text-white/50">
-                Name
-              </label>
-              <input
-                id="contact-name"
-                type="text"
-                value={form.name}
-                onChange={update('name')}
-                aria-invalid={!!errors.name}
-                aria-describedby={errors.name ? 'err-name' : undefined}
-                placeholder="Your name"
-                className={fieldClass(errors.name)}
-              />
-              {errors.name && (
-                <p id="err-name" className="mt-2 text-[13px] text-[#e0888a]">{errors.name}</p>
-              )}
+          <form noValidate onSubmit={onSubmit} className="hud-panel overflow-hidden">
+            {/* terminal bar */}
+            <div className="flex items-center gap-3 border-b border-hud-line-strong bg-white/[0.02] px-4 py-3">
+              <span className="h-1.5 w-1.5 rounded-full bg-hud hud-blink" aria-hidden />
+              <span className="font-hud text-[11px] tracking-[0.16em] text-ink-mute">
+                transmission · new message
+              </span>
             </div>
 
-            <div className="mt-6">
-              <label htmlFor="contact-email" className="font-mono text-[11px] uppercase tracking-[0.16em] text-white/50">
-                Email
-              </label>
-              <input
-                id="contact-email"
-                type="email"
-                value={form.email}
-                onChange={update('email')}
-                aria-invalid={!!errors.email}
-                aria-describedby={errors.email ? 'err-email' : undefined}
-                placeholder="you@example.com"
-                className={fieldClass(errors.email)}
-              />
-              {errors.email && (
-                <p id="err-email" className="mt-2 text-[13px] text-[#e0888a]">{errors.email}</p>
-              )}
-            </div>
-
-            <div className="mt-6">
-              <label htmlFor="contact-message" className="font-mono text-[11px] uppercase tracking-[0.16em] text-white/50">
-                Message
-              </label>
-              <textarea
-                id="contact-message"
-                rows={5}
-                value={form.message}
-                onChange={update('message')}
-                aria-invalid={!!errors.message}
-                aria-describedby={errors.message ? 'err-message' : undefined}
-                placeholder="Tell me about the opportunity or idea…"
-                className={`${fieldClass(errors.message)} resize-y`}
-              />
-              {errors.message && (
-                <p id="err-message" className="mt-2 text-[13px] text-[#e0888a]">{errors.message}</p>
-              )}
-            </div>
-
-            <button
-              type="submit"
-              disabled={status === 'loading'}
-              className="mt-8 inline-flex w-full items-center justify-center gap-2 rounded-full bg-white px-7 py-3.5 text-[12px] font-semibold uppercase tracking-[0.16em] text-neutral-900 transition-transform duration-300 hover:-translate-y-0.5 disabled:opacity-70"
-            >
-              {status === 'loading' ? 'Sending…' : 'Send Message'}
-            </button>
-
-            {status === 'notice' && (
-              <div
-                role="status"
-                className="mt-5 rounded-md border border-[#6cb6e6]/30 bg-[#6cb6e6]/5 px-4 py-4 text-[13px] leading-relaxed text-[#c9dcec]"
-              >
-                Thanks{form.name ? `, ${form.name.trim()}` : ''}! This form isn&apos;t connected to a
-                messaging service yet, so nothing was sent. Please reach me directly at{' '}
-                <a href={profile.emailHref} className="underline decoration-[#6cb6e6]/60 underline-offset-2 hover:text-white">
-                  {profile.email}
-                </a>{' '}
-                or on{' '}
-                <a href={profile.linkedin} target="_blank" rel="noopener noreferrer" className="underline decoration-[#6cb6e6]/60 underline-offset-2 hover:text-white">
-                  LinkedIn
-                </a>.
+            <div className="p-5 md:p-7">
+              <div>
+                <label htmlFor="contact-name" className="hud-label">
+                  Name
+                </label>
+                <input
+                  id="contact-name"
+                  type="text"
+                  value={form.name}
+                  onChange={update('name')}
+                  aria-invalid={!!errors.name}
+                  aria-describedby={errors.name ? 'err-name' : undefined}
+                  placeholder="Your name"
+                  className={fieldClass(errors.name)}
+                />
+                {errors.name && (
+                  <p id="err-name" className="mt-2 font-hud text-[12px] text-red-400">
+                    {errors.name}
+                  </p>
+                )}
               </div>
-            )}
+
+              <div className="mt-5">
+                <label htmlFor="contact-email" className="hud-label">
+                  Email
+                </label>
+                <input
+                  id="contact-email"
+                  type="email"
+                  value={form.email}
+                  onChange={update('email')}
+                  aria-invalid={!!errors.email}
+                  aria-describedby={errors.email ? 'err-email' : undefined}
+                  placeholder="you@example.com"
+                  className={fieldClass(errors.email)}
+                />
+                {errors.email && (
+                  <p id="err-email" className="mt-2 font-hud text-[12px] text-red-400">
+                    {errors.email}
+                  </p>
+                )}
+              </div>
+
+              <div className="mt-5">
+                <label htmlFor="contact-message" className="hud-label">
+                  Message
+                </label>
+                <textarea
+                  id="contact-message"
+                  rows={5}
+                  value={form.message}
+                  onChange={update('message')}
+                  aria-invalid={!!errors.message}
+                  aria-describedby={errors.message ? 'err-message' : undefined}
+                  placeholder="Tell me about the opportunity or idea…"
+                  className={`${fieldClass(errors.message)} resize-y leading-relaxed`}
+                />
+                {errors.message && (
+                  <p id="err-message" className="mt-2 font-hud text-[12px] text-red-400">
+                    {errors.message}
+                  </p>
+                )}
+              </div>
+
+              <button
+                type="submit"
+                disabled={status === 'loading'}
+                className="hud-btn mt-7 w-full justify-center disabled:opacity-70"
+              >
+                <Send className="h-3.5 w-3.5" aria-hidden />
+                {status === 'loading' ? 'Sending…' : 'Send Message'}
+              </button>
+
+              {status === 'notice' && (
+                <div
+                  role="status"
+                  className="mt-5 border border-hud/30 bg-hud/[0.06] px-4 py-4 text-[13px] leading-relaxed text-ink-dim"
+                >
+                  Thanks{form.name ? `, ${form.name.trim()}` : ''}! This form isn&apos;t connected
+                  to a messaging service yet, so nothing was sent. Please reach me directly at{' '}
+                  <a
+                    href={profile.emailHref}
+                    className="text-hud-bright underline underline-offset-2 hover:text-white"
+                  >
+                    {profile.email}
+                  </a>{' '}
+                  or on{' '}
+                  <a
+                    href={profile.linkedin}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-hud-bright underline underline-offset-2 hover:text-white"
+                  >
+                    LinkedIn
+                  </a>
+                  .
+                </div>
+              )}
+            </div>
           </form>
         </Reveal>
       </div>
-    </section>
+    </SectionShell>
   );
 }

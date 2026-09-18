@@ -20,7 +20,7 @@ import Footer from '@/components/portfolio/Footer';
 function App() {
   return (
     <SmoothScroll>
-      <main className="relative min-h-screen w-full overflow-x-hidden bg-[#faf9f6] text-neutral-900">
+      <main className="relative min-h-screen w-full overflow-x-hidden bg-void text-ink">
         <Navbar />
         <Hero />
         <About />

@@ -1,56 +1,48 @@
 'use client';
 
 import Reveal from './Reveal';
+import SectionShell from './hud/SectionShell';
+import HudHeading from './hud/HudHeading';
 import { skills } from '@/lib/data/site';
 
 /**
- * Technical Skills
- * Resume facts transformed into an editorial, interactive system.
- * No percentages, no ranking. Every skill is always visible (accessible on
- * mobile); hover only enhances. Category rows reveal in a staggered sequence.
+ * Skills — LOADOUT
+ * Equipped technologies grouped by slot (Languages, Frontend, …). Every item
+ * is always visible and factual: no bars, percentages, levels or rankings.
+ * Hover/focus only lights the chip.
  */
 export default function Skills() {
   return (
-    <section
-      id="skills"
-      className="relative w-full overflow-hidden bg-[#08080a] text-[#f5f3ee]"
-    >
-      <div className="mx-auto w-full max-w-[1400px] px-6 pb-40 pt-24 md:px-10 md:pb-52 md:pt-32">
-        <Reveal as="p" className="about-eyebrow">
-          <span className="mr-3 inline-block h-px w-8 align-middle bg-[#86a5cc]" />
-          {skills.eyebrow}
-        </Reveal>
-        <Reveal
-          as="h2"
-          delay={0.05}
-          className="mt-8 font-display text-[clamp(2.25rem,5.5vw,5rem)] font-bold uppercase leading-[0.95] tracking-[-0.03em]"
-        >
-          {skills.heading}
-        </Reveal>
+    <SectionShell id="skills" surface="void" grid="plain" scanlines>
+      <HudHeading index="04" label={skills.eyebrow} heading={skills.heading} />
 
-        <dl className="mt-16 md:mt-24">
-          {skills.categories.map((cat, i) => (
-            <Reveal key={cat.category} delay={0.05 * i}>
-              <div className="group grid grid-cols-1 gap-5 border-t border-white/10 py-8 md:grid-cols-[260px_minmax(0,1fr)] md:gap-12 md:py-10">
-                <dt className="font-display text-sm font-semibold uppercase tracking-[0.22em] text-[#86a5cc]">
+      <dl className="mt-10 md:mt-14">
+        {skills.categories.map((cat, i) => (
+          <Reveal key={cat.category} delay={0.05 * i}>
+            <div className="group grid grid-cols-1 gap-5 border-t border-hud-line-strong py-7 last:border-b md:grid-cols-[minmax(0,240px)_minmax(0,1fr)] md:gap-12 md:py-9">
+              <dt className="flex items-baseline gap-3">
+                <span className="font-hud text-[11px] text-hud opacity-70">
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+                <span className="font-display text-sm font-semibold uppercase tracking-[0.22em] text-hud-bright">
                   {cat.category}
-                </dt>
-                <dd className="flex flex-wrap gap-2.5">
-                  {cat.items.map((item) => (
-                    <span
-                      key={item}
-                      tabIndex={0}
-                      className="cursor-default rounded-full border border-white/12 bg-white/[0.02] px-4 py-2 text-[13px] text-[#c9c9cf] outline-none transition-all duration-300 hover:-translate-y-0.5 hover:border-[#86a5cc] hover:text-white focus-visible:border-[#86a5cc] focus-visible:text-white group-hover:border-white/25 md:text-sm"
-                    >
-                      {item}
-                    </span>
-                  ))}
-                </dd>
-              </div>
-            </Reveal>
-          ))}
-        </dl>
-      </div>
-    </section>
+                </span>
+              </dt>
+              <dd className="flex flex-wrap gap-2">
+                {cat.items.map((item) => (
+                  <span
+                    key={item}
+                    tabIndex={0}
+                    className="cursor-default border border-hud-line-strong bg-white/[0.02] px-3.5 py-2 font-hud text-[11px] uppercase tracking-[0.1em] text-ink-dim outline-none transition-all duration-300 hover:-translate-y-0.5 hover:border-hud hover:bg-hud/10 hover:text-ink focus-visible:border-hud focus-visible:text-ink md:text-xs"
+                  >
+                    {item}
+                  </span>
+                ))}
+              </dd>
+            </div>
+          </Reveal>
+        ))}
+      </dl>
+    </SectionShell>
   );
 }

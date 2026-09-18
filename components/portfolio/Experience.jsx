@@ -3,16 +3,14 @@
 import { useRef } from 'react';
 import { motion, useScroll, useTransform, useReducedMotion } from 'framer-motion';
 import Reveal from './Reveal';
+import SectionShell from './hud/SectionShell';
+import HudHeading from './hud/HudHeading';
 import { experience } from '@/lib/data/site';
 
-const ACCENT = '#3b5b7a';
-
 /**
- * Experience
- * A light editorial career timeline that intentionally contrasts the dark
- * Technical Skills section above it. A faint rail runs the full height while
- * an accent line draws on scroll; each milestone reveals in a staggered
- * sequence. All content is always visible (accessible); hover only enhances.
+ * Experience — CAREER LOG
+ * Each role is a log entry: entry marker, period, then the real company, role,
+ * responsibilities, technologies and applications. Nothing is embellished.
  */
 export default function Experience() {
   const railRef = useRef(null);
@@ -26,152 +24,121 @@ export default function Experience() {
   const lineScaleY = prefersReduced ? 1 : drawn;
 
   return (
-    <section
-      id="experience"
-      className="relative w-full overflow-hidden bg-[#faf9f6] text-neutral-900"
-    >
-      {/* Dark Skills environment receding into the light editorial one */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 h-[58vh]"
-        style={{
-          background:
-            'linear-gradient(to bottom, #08080a 0%, rgba(8,8,10,0.5) 24%, rgba(250,249,246,0) 100%)',
-        }}
-      />
+    <SectionShell id="experience" surface="panel" grid="plain" glow="top">
+      <HudHeading index="05" label={experience.eyebrow} heading={experience.heading} />
 
-      <div className="relative mx-auto w-full max-w-[1400px] px-6 pb-40 pt-[42vh] md:px-10 md:pb-52">
-        <Reveal
-          as="p"
-          className="flex items-center text-xs font-semibold uppercase tracking-[0.24em] text-[#3b5b7a]"
-        >
-          <span className="mr-3 inline-block h-px w-8 bg-[#3b5b7a]" />
-          {experience.eyebrow}
-        </Reveal>
-        <Reveal
-          as="h2"
-          delay={0.05}
-          className="mt-8 font-display text-[clamp(2.25rem,5.5vw,5rem)] font-bold uppercase leading-[0.95] tracking-[-0.03em] text-neutral-900"
-        >
-          {experience.heading}
-        </Reveal>
-
-        {/* Timeline */}
-        <div ref={railRef} className="relative mt-20 md:mt-28">
-          {/* Faint full-height rail */}
-          <div className="absolute bottom-2 left-[7px] top-2 w-px bg-neutral-900/12 md:left-[9px]">
-            <motion.div
-              style={{ scaleY: lineScaleY }}
-              className="absolute inset-0 origin-top bg-gradient-to-b from-[#3b5b7a] to-[#7d97b3]"
-            />
-          </div>
-
-          <ol className="space-y-28 md:space-y-40">
-            {experience.items.map((item) => (
-              <li
-                key={item.id}
-                className="group relative pl-12 md:grid md:grid-cols-[minmax(220px,300px)_1fr] md:gap-16 md:pl-24"
-              >
-                {/* Milestone dot */}
-                <span className="absolute left-0 top-1.5 block h-4 w-4 rounded-full bg-[#3b5b7a] ring-8 ring-[#faf9f6]" />
-
-                {/* Left column — index / period / duration */}
-                <div className="md:pt-1">
-                  <Reveal className="font-display text-sm font-semibold tracking-widest text-[#3b5b7a]">
-                    {item.index}
-                  </Reveal>
-                  <Reveal
-                    delay={0.06}
-                    className="mt-4 text-sm font-medium text-neutral-500"
-                  >
-                    {item.period}
-                  </Reveal>
-                  <Reveal
-                    delay={0.1}
-                    className="mt-2 inline-flex items-center rounded-full border border-neutral-900/12 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-neutral-600"
-                  >
-                    {item.duration}
-                  </Reveal>
-                </div>
-
-                {/* Right column — company / role / detail */}
-                <div className="mt-8 md:mt-0">
-                  <Reveal
-                    as="h3"
-                    className="font-display text-3xl font-bold uppercase leading-[0.95] tracking-tight text-neutral-900 transition-transform duration-300 group-hover:translate-x-1 md:text-5xl"
-                  >
-                    {item.company}
-                  </Reveal>
-                  <Reveal
-                    as="p"
-                    delay={0.08}
-                    className="mt-3 text-base font-medium text-[#3b5b7a] md:text-lg"
-                  >
-                    {item.role}
-                  </Reveal>
-
-                  <div className="mt-7 max-w-2xl space-y-4">
-                    {item.descriptions.map((d, i) => (
-                      <Reveal
-                        as="p"
-                        key={i}
-                        delay={0.14 + i * 0.06}
-                        className="text-[15px] leading-relaxed text-neutral-600 md:text-base"
-                      >
-                        {d}
-                      </Reveal>
-                    ))}
-                  </div>
-
-                  {/* Technologies */}
-                  {item.technologies.length > 0 && (
-                    <Reveal delay={0.24} className="mt-9">
-                      <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-neutral-400">
-                        Technologies
-                      </p>
-                      <ul className="mt-4 flex flex-wrap gap-2.5">
-                        {item.technologies.map((t) => (
-                          <li
-                            key={t}
-                            tabIndex={0}
-                            className="cursor-default rounded-full border border-neutral-900/12 bg-white px-3.5 py-1.5 text-[13px] text-neutral-700 outline-none transition-all duration-300 hover:-translate-y-0.5 hover:border-[#3b5b7a] hover:text-neutral-900 focus-visible:border-[#3b5b7a] group-hover:border-neutral-900/20"
-                          >
-                            {t}
-                          </li>
-                        ))}
-                      </ul>
-                    </Reveal>
-                  )}
-
-                  {/* Applications (secondary — detailed later in Projects) */}
-                  {item.applications.length > 0 && (
-                    <Reveal delay={0.3} className="mt-9">
-                      <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-neutral-400">
-                        Applications
-                      </p>
-                      <ul className="mt-4 grid grid-cols-1 gap-x-10 gap-y-4 sm:grid-cols-3">
-                        {item.applications.map((app) => (
-                          <li
-                            key={app.name}
-                            className="border-t border-neutral-900/10 pt-3 transition-colors duration-300 group-hover:border-[#3b5b7a]/40"
-                          >
-                            <p className="font-display text-base font-semibold uppercase tracking-tight text-neutral-900">
-                              {app.name}
-                            </p>
-                            <p className="mt-1 text-[13px] text-neutral-500">
-                              {app.kind}
-                            </p>
-                          </li>
-                        ))}
-                      </ul>
-                    </Reveal>
-                  )}
-                </div>
-              </li>
-            ))}
-          </ol>
+      <div ref={railRef} className="relative mt-12 md:mt-16">
+        {/* Log rail */}
+        <div className="absolute bottom-2 left-[7px] top-2 w-px bg-hud-line-strong md:left-[9px]">
+          <motion.div
+            className="absolute inset-0 origin-top"
+            style={{
+              scaleY: lineScaleY,
+              background: 'linear-gradient(to bottom, var(--accent-bright), var(--accent-deep))',
+              boxShadow: '0 0 12px var(--hud-glow)',
+            }}
+          />
         </div>
+
+        <ol className="space-y-16 md:space-y-24">
+          {experience.items.map((item) => (
+            <li
+              key={item.id}
+              className="group relative pl-12 md:grid md:grid-cols-[minmax(200px,280px)_1fr] md:gap-14 md:pl-24"
+            >
+              {/* Entry marker */}
+              <span
+                aria-hidden
+                className="absolute left-0 top-1.5 block h-[15px] w-[15px] border border-hud bg-void"
+              >
+                <span className="absolute inset-[3px] bg-hud shadow-[0_0_10px_var(--hud-glow)]" />
+              </span>
+
+              {/* Left: entry id / period / duration */}
+              <div className="md:pt-1">
+                <Reveal className="hud-label hud-label-accent">
+                  Log Entry {item.index}
+                </Reveal>
+                <Reveal delay={0.06} className="mt-4 font-hud text-sm text-ink-dim">
+                  {item.period}
+                </Reveal>
+                <Reveal
+                  delay={0.1}
+                  className="mt-3 inline-flex items-center gap-2 border border-hud-line-strong px-3 py-1 font-hud text-[10px] font-semibold uppercase tracking-[0.18em] text-ink-mute"
+                >
+                  <span className="h-1 w-1 rounded-full bg-hud" />
+                  {item.duration}
+                </Reveal>
+              </div>
+
+              {/* Right: company / role / detail */}
+              <div className="mt-8 md:mt-0">
+                <Reveal
+                  as="h3"
+                  className="font-display text-3xl font-bold uppercase leading-[0.95] tracking-tight text-ink transition-transform duration-300 group-hover:translate-x-1 md:text-5xl"
+                >
+                  {item.company}
+                </Reveal>
+                <Reveal as="p" delay={0.08} className="mt-3 font-hud text-sm uppercase tracking-[0.16em] text-hud-bright md:text-base">
+                  {item.role}
+                </Reveal>
+
+                <div className="mt-7 max-w-2xl space-y-4">
+                  {item.descriptions.map((d, i) => (
+                    <Reveal
+                      as="p"
+                      key={i}
+                      delay={0.14 + i * 0.06}
+                      className="flex gap-3 text-[15px] leading-relaxed text-ink-dim md:text-base"
+                    >
+                      <span aria-hidden className="mt-2.5 h-px w-4 flex-none bg-hud opacity-70" />
+                      <span>{d}</span>
+                    </Reveal>
+                  ))}
+                </div>
+
+                {/* Technologies */}
+                {item.technologies.length > 0 && (
+                  <Reveal delay={0.24} className="mt-8">
+                    <p className="hud-label">Technologies</p>
+                    <ul className="mt-4 flex flex-wrap gap-2">
+                      {item.technologies.map((t) => (
+                        <li
+                          key={t}
+                          tabIndex={0}
+                          className="cursor-default border border-hud-line-strong bg-white/[0.02] px-3 py-1.5 font-hud text-[11px] uppercase tracking-[0.1em] text-ink-dim outline-none transition-all duration-300 hover:-translate-y-0.5 hover:border-hud hover:text-ink focus-visible:border-hud"
+                        >
+                          {t}
+                        </li>
+                      ))}
+                    </ul>
+                  </Reveal>
+                )}
+
+                {/* Applications built */}
+                {item.applications.length > 0 && (
+                  <Reveal delay={0.3} className="mt-8">
+                    <p className="hud-label">Applications Built</p>
+                    <ul className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
+                      {item.applications.map((app) => (
+                        <li
+                          key={app.name}
+                          className="hud-corners hud-panel hud-panel-hover relative px-4 py-3.5"
+                        >
+                          <p className="font-display text-base font-semibold uppercase tracking-tight text-ink">
+                            {app.name}
+                          </p>
+                          <p className="mt-1 font-hud text-[11px] text-ink-mute">{app.kind}</p>
+                        </li>
+                      ))}
+                    </ul>
+                  </Reveal>
+                )}
+              </div>
+            </li>
+          ))}
+        </ol>
       </div>
-    </section>
+    </SectionShell>
   );
 }

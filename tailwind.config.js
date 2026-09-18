@@ -19,7 +19,31 @@ module.exports = {
         }
       },
       extend: {
+        fontFamily: {
+          hud: ['JetBrains Mono', 'ui-monospace', 'SFMono-Regular', 'monospace'],
+        },
         colors: {
+          // HUD palette — see globals.css for the token definitions. The
+          // `<alpha-value>` form is required for opacity modifiers such as
+          // `bg-hud/10` to compile.
+          void: 'rgb(var(--void-rgb) / <alpha-value>)',
+          deep: 'rgb(var(--deep-rgb) / <alpha-value>)',
+          panel: 'rgb(var(--panel-rgb) / <alpha-value>)',
+          raised: 'rgb(var(--raised-rgb) / <alpha-value>)',
+          ink: {
+            DEFAULT: 'rgb(var(--ink-rgb) / <alpha-value>)',
+            dim: 'rgb(var(--ink-dim-rgb) / <alpha-value>)',
+            mute: 'rgb(var(--ink-mute-rgb) / <alpha-value>)',
+          },
+          hud: {
+            DEFAULT: 'rgb(var(--accent-core-rgb) / <alpha-value>)',
+            bright: 'rgb(var(--accent-bright-rgb) / <alpha-value>)',
+            deep: 'rgb(var(--accent-deep-rgb) / <alpha-value>)',
+            violet: 'rgb(var(--accent-violet-rgb) / <alpha-value>)',
+            // Line colours are already rgba() and are used without modifiers.
+            line: 'var(--hud-line)',
+            'line-strong': 'var(--hud-line-strong)',
+          },
           border: 'hsl(var(--border))',
           input: 'hsl(var(--input))',
           ring: 'hsl(var(--ring))',

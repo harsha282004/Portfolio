@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
 import { identity, navItems } from '@/lib/data/site';
+import { handleAnchorClick } from '@/lib/utils/scrollToAnchor';
 
 /**
  * Minimal sticky navigation shell.
@@ -49,35 +50,32 @@ export default function Navbar() {
     };
   }, [open]);
 
-  // Smooth-scroll to an in-page section (via Lenis when available).
   const handleNav = (e, href) => {
-    if (!href || !href.startsWith('#')) return;
     setOpen(false);
-    const el = document.querySelector(href);
-    if (!el) return; // placeholder targets (#work/#contact) fall through harmlessly
-    e.preventDefault();
-    if (typeof window !== 'undefined' && window.__lenis) {
-      window.__lenis.scrollTo(el, { offset: -80, duration: 1.2 });
-    } else {
-      el.scrollIntoView({ behavior: 'smooth' });
-    }
+    handleAnchorClick(e, href);
   };
 
   return (
     <header
       className={`fixed inset-x-0 top-0 z-50 transition-all duration-500 ${
         scrolled
-          ? 'backdrop-blur-md bg-[#faf9f6]/70 border-b border-neutral-900/5'
-          : 'bg-transparent border-b border-transparent'
+          ? 'border-b border-hud-line-strong bg-void/80 backdrop-blur-md'
+          : 'border-b border-transparent bg-transparent'
       }`}
     >
       <nav className="mx-auto flex h-16 w-full max-w-[1400px] items-center justify-between px-6 md:h-20 md:px-10">
         <a
           href="#top"
           onClick={(e) => handleNav(e, '#top')}
-          className="font-display text-sm font-bold uppercase tracking-[0.28em] text-neutral-900"
+          className="group flex items-center gap-2.5"
         >
-          {identity.wordmark}
+          <span
+            aria-hidden
+            className="h-1.5 w-1.5 rounded-full bg-hud shadow-[0_0_10px_var(--hud-glow)]"
+          />
+          <span className="font-display text-sm font-bold uppercase tracking-[0.28em] text-ink">
+            {identity.wordmark}
+          </span>
         </a>
 
         {/* Desktop links */}
@@ -91,13 +89,13 @@ export default function Navbar() {
                     href={item.href}
                     onClick={(e) => handleNav(e, item.href)}
                     aria-current={active ? 'true' : undefined}
-                    className={`group relative text-[13px] font-medium uppercase tracking-[0.18em] transition-colors ${
-                      active ? 'text-neutral-900' : 'text-neutral-500 hover:text-neutral-900'
+                    className={`group relative font-hud text-[11px] font-medium uppercase tracking-[0.22em] transition-colors ${
+                      active ? 'text-hud-bright' : 'text-ink-dim hover:text-ink'
                     }`}
                   >
                     {item.label}
                     <span
-                      className={`absolute -bottom-1.5 left-0 h-px bg-neutral-900 transition-all duration-300 ${
+                      className={`absolute -bottom-1.5 left-0 h-px bg-hud transition-all duration-300 ${
                         active ? 'w-full' : 'w-0 group-hover:w-full'
                       }`}
                     />
@@ -109,7 +107,7 @@ export default function Navbar() {
           <a
             href="#contact"
             onClick={(e) => handleNav(e, '#contact')}
-            className="rounded-full border border-neutral-900/15 px-5 py-2 text-[12px] font-semibold uppercase tracking-[0.16em] text-neutral-900 transition-all duration-300 hover:bg-neutral-900 hover:text-[#faf9f6]"
+            className="border border-hud-line-strong px-5 py-2 font-hud text-[11px] font-semibold uppercase tracking-[0.2em] text-ink-dim transition-all duration-300 hover:border-hud hover:bg-hud/10 hover:text-hud-bright"
           >
             Let&apos;s talk
           </a>
@@ -120,7 +118,7 @@ export default function Navbar() {
           type="button"
           aria-label={open ? 'Close menu' : 'Open menu'}
           onClick={() => setOpen((v) => !v)}
-          className="flex h-10 w-10 items-center justify-center rounded-full text-neutral-900 lg:hidden"
+          className="flex h-10 w-10 items-center justify-center border border-hud-line-strong text-ink transition-colors hover:border-hud hover:text-hud-bright lg:hidden"
         >
           {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </button>
@@ -134,9 +132,10 @@ export default function Navbar() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="fixed inset-0 top-16 z-40 bg-[#faf9f6] px-6 lg:hidden"
+            className="fixed inset-0 top-16 z-40 bg-void px-6 lg:hidden"
           >
-            <ul className="flex flex-col gap-2 pt-8">
+            <div aria-hidden className="pointer-events-none absolute inset-0 hud-grid" />
+            <ul className="relative flex flex-col gap-2 pt-8">
               {navItems.map((item, i) => (
                 <motion.li
                   key={item.label}
@@ -147,8 +146,11 @@ export default function Navbar() {
                   <a
                     href={item.href}
                     onClick={(e) => handleNav(e, item.href)}
-                    className="block border-b border-neutral-900/10 py-5 font-display text-3xl font-medium uppercase tracking-tight text-neutral-900"
+                    className="flex items-center gap-4 border-b border-hud-line-strong py-5 font-display text-3xl font-medium uppercase tracking-tight text-ink transition-colors hover:text-hud-bright"
                   >
+                    <span className="font-hud text-[11px] tracking-[0.2em] text-hud">
+                      {String(i + 1).padStart(2, '0')}
+                    </span>
                     {item.label}
                   </a>
                 </motion.li>

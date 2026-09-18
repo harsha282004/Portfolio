@@ -13,8 +13,10 @@ import { identity } from '@/lib/data/site';
  * - A hidden lens layer is pre-wired here so the Phase 3 glass/X-ray skull
  *   effect can be added cleanly without restructuring the hero.
  */
+/* Long, gradual feather. A short falloff leaves a visible oval edge where the
+   photograph's studio white meets the hero's light pool. */
 const EDGE_MASK =
-  'radial-gradient(ellipse closest-side at 50% 45%, #000 55%, rgba(0,0,0,0) 100%)';
+  'radial-gradient(ellipse closest-side at 50% 45%, #000 30%, rgba(0,0,0,0.82) 56%, rgba(0,0,0,0.34) 78%, rgba(0,0,0,0) 100%)';
 
 export default function Portrait({
   className = '',
@@ -53,6 +55,20 @@ export default function Portrait({
       className={`relative ${className}`}
       data-hero-portrait
     >
+      {/* Atmospheric bloom directly behind the subject — reads as the light
+          source the portrait is standing in. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute left-1/2 top-1/2 -z-10 -translate-x-1/2 -translate-y-1/2"
+        style={{
+          width: '185%',
+          height: '145%',
+          background:
+            'radial-gradient(ellipse at center, rgba(255,255,255,0.50) 0%, rgba(232,244,255,0.30) 38%, rgba(140,200,255,0.16) 62%, rgba(77,184,255,0) 84%)',
+          filter: 'blur(26px)',
+        }}
+      />
+
       <Image
         src={identity.photo.src}
         alt={identity.photo.alt}
@@ -60,10 +76,26 @@ export default function Portrait({
         height={1200}
         priority
         sizes="(max-width: 768px) 70vw, 40vw"
-        className={`pointer-events-none select-none object-contain ${imgClassName}`}
+        className={`pointer-events-none relative select-none object-contain ${imgClassName}`}
         style={{
           WebkitMaskImage: EDGE_MASK,
           maskImage: EDGE_MASK,
+          // Cool rim separation + grounded shadow, no recolouring of the photo.
+          filter:
+            'drop-shadow(0 18px 44px rgba(4,8,16,0.55)) drop-shadow(0 0 26px rgba(77,184,255,0.22))',
+        }}
+      />
+
+      {/* Cool rim-light wash across the upper edge, clipped to the same mask so
+          it never draws a hard box around the photograph. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 mix-blend-soft-light"
+        style={{
+          WebkitMaskImage: EDGE_MASK,
+          maskImage: EDGE_MASK,
+          background:
+            'linear-gradient(200deg, rgba(138,217,255,0.5) 0%, rgba(138,217,255,0) 45%)',
         }}
       />
 

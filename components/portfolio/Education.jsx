@@ -3,13 +3,14 @@
 import { useRef } from 'react';
 import { motion, useScroll, useTransform, useReducedMotion } from 'framer-motion';
 import Reveal from './Reveal';
+import SectionShell from './hud/SectionShell';
+import HudHeading from './hud/HudHeading';
 import { education } from '@/lib/data/site';
 
 /**
- * Education Journey
- * A cinematic vertical timeline. A faint rail runs the full height while an
- * accent line "draws" itself as the user scrolls. Each milestone reveals in a
- * staggered sequence: year -> institution -> qualification -> score.
+ * Education — JOURNEY LOG
+ * Progression through stages. A rail draws itself on scroll and each stage is
+ * a completed waypoint: STAGE 01..03 with the real institution and result.
  */
 export default function Education() {
   const railRef = useRef(null);
@@ -23,93 +24,77 @@ export default function Education() {
   const lineScaleY = prefersReduced ? 1 : drawn;
 
   return (
-    <section
-      id="journey"
-      className="relative w-full overflow-hidden bg-[#0b0b0d] text-[#f5f3ee]"
-    >
-      <div className="mx-auto w-full max-w-[1400px] px-6 pb-40 pt-24 md:px-10 md:pb-52 md:pt-32">
-        <Reveal as="p" className="about-eyebrow">
-          <span className="mr-3 inline-block h-px w-8 align-middle bg-[#86a5cc]" />
-          Education Journey
-        </Reveal>
-        <Reveal
-          as="h2"
-          delay={0.05}
-          className="mt-8 font-display text-[clamp(2.25rem,5.5vw,5rem)] font-bold uppercase leading-[0.95] tracking-[-0.03em]"
-        >
-          The path so far
-        </Reveal>
+    <SectionShell id="journey" surface="void" grid="plain">
+      <HudHeading index="02" label="Journey Log" heading="The path so far" />
 
-        {/* Timeline */}
-        <div ref={railRef} className="relative mt-20 md:mt-28">
-          {/* Faint full-height rail */}
-          <div className="absolute bottom-2 left-[7px] top-2 w-px bg-white/12 md:left-[9px]">
-            {/* Accent line that draws on scroll */}
-            <motion.div
-              style={{ scaleY: lineScaleY }}
-              className="absolute inset-0 origin-top bg-gradient-to-b from-[#86a5cc] to-[#5f7fa6]"
-            />
-          </div>
-
-          <ol className="space-y-24 md:space-y-32">
-            {education.map((item, idx) => (
-              <li
-                key={item.id}
-                className="relative pl-12 md:grid md:grid-cols-[minmax(220px,320px)_1fr] md:gap-16 md:pl-24"
-              >
-                {/* Milestone dot */}
-                <Reveal
-                  as="span"
-                  className="absolute left-0 top-1.5 md:left-0"
-                >
-                  <span className="block h-4 w-4 rounded-full bg-[#86a5cc] ring-8 ring-[#0b0b0d]" />
-                </Reveal>
-
-                {/* Year / year range */}
-                <div className="md:pt-0">
-                  {item.yearRange ? (
-                    <Reveal className="flex items-center gap-4">
-                      <span className="edu-year">{item.yearRange[0]}</span>
-                      <span className="h-px w-10 bg-[#86a5cc]/70 md:w-16" />
-                      <span className="edu-year">{item.yearRange[1]}</span>
-                    </Reveal>
-                  ) : (
-                    <Reveal className="edu-year">{item.year}</Reveal>
-                  )}
-                </div>
-
-                {/* Details */}
-                <div className="mt-5 md:mt-2">
-                  <Reveal
-                    as="h3"
-                    delay={0.08}
-                    className="font-display text-2xl font-semibold leading-tight text-[#f5f3ee] md:text-3xl"
-                  >
-                    {item.institution}
-                    {item.location && (
-                      <span className="text-[#8f8f97]">{`, ${item.location}`}</span>
-                    )}
-                  </Reveal>
-                  <Reveal
-                    as="p"
-                    delay={0.16}
-                    className="mt-3 text-base text-[#8f8f97] md:text-lg"
-                  >
-                    {item.qualification}
-                  </Reveal>
-                  <Reveal
-                    as="p"
-                    delay={0.24}
-                    className="mt-5 font-display text-xl font-bold tracking-wide text-[#86a5cc] md:text-2xl"
-                  >
-                    {item.score}
-                  </Reveal>
-                </div>
-              </li>
-            ))}
-          </ol>
+      {/* Stage timeline */}
+      <div ref={railRef} className="relative mt-12 md:mt-16">
+        {/* Faint rail + accent line that draws on scroll */}
+        <div className="absolute bottom-2 left-[9px] top-2 w-px bg-hud-line-strong md:left-[11px]">
+          <motion.div
+            className="absolute inset-0 origin-top"
+            style={{
+              scaleY: lineScaleY,
+              background: 'linear-gradient(to bottom, var(--accent-bright), var(--accent-deep))',
+              boxShadow: '0 0 12px var(--hud-glow)',
+            }}
+          />
         </div>
+
+        <ol className="space-y-14 md:space-y-20">
+          {education.map((item, idx) => (
+            <li
+              key={item.id}
+              className="relative pl-12 md:grid md:grid-cols-[minmax(220px,320px)_1fr] md:gap-16 md:pl-24"
+            >
+              {/* Waypoint marker */}
+              <Reveal as="span" className="absolute left-0 top-1.5">
+                <span className="relative block h-[19px] w-[19px]">
+                  <span className="absolute inset-0 rotate-45 border border-hud bg-void" />
+                  <span className="absolute inset-[6px] rotate-45 bg-hud shadow-[0_0_10px_var(--hud-glow)]" />
+                </span>
+              </Reveal>
+
+              {/* Stage + year */}
+              <div>
+                <Reveal className="hud-label hud-label-accent mb-3">
+                  Stage {String(idx + 1).padStart(2, '0')}
+                </Reveal>
+                {item.yearRange ? (
+                  <Reveal className="flex items-center gap-4">
+                    <span className="edu-year">{item.yearRange[0]}</span>
+                    <span className="h-px w-10 bg-hud opacity-70 md:w-16" />
+                    <span className="edu-year">{item.yearRange[1]}</span>
+                  </Reveal>
+                ) : (
+                  <Reveal className="edu-year">{item.year}</Reveal>
+                )}
+              </div>
+
+              {/* Details */}
+              <div className="mt-5 md:mt-9">
+                <Reveal
+                  as="h3"
+                  delay={0.08}
+                  className="font-display text-2xl font-semibold leading-tight text-ink md:text-3xl"
+                >
+                  {item.institution}
+                  {item.location && <span className="text-ink-mute">{`, ${item.location}`}</span>}
+                </Reveal>
+                <Reveal as="p" delay={0.16} className="mt-3 text-base text-ink-dim md:text-lg">
+                  {item.qualification}
+                </Reveal>
+                <Reveal delay={0.24} className="mt-5 inline-flex items-center gap-3">
+                  <span className="hud-label">Result</span>
+                  <span className="font-display text-xl font-bold tracking-wide hud-glow-text md:text-2xl">
+                    {item.score}
+                  </span>
+                </Reveal>
+              </div>
+            </li>
+          ))}
+        </ol>
       </div>
-    </section>
+    </SectionShell>
   );
 }

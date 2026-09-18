@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,26 +6,65 @@
 
 @layer base {
   :root {
-    --background: 40 30% 98.5%;
-    --foreground: 0 0% 7%;
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 7%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 7%;
-    --primary: 0 0% 9%;
-    --primary-foreground: 40 33% 97%;
-    --secondary: 40 20% 92%;
-    --secondary-foreground: 0 0% 9%;
-    --muted: 40 20% 92%;
-    --muted-foreground: 0 0% 45%;
-    --accent: 210 34% 36%;
-    --accent-foreground: 40 33% 97%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 0 0% 90%;
-    --input: 0 0% 90%;
-    --ring: 0 0% 9%;
-    --radius: 0.5rem;
+    --background: 222 32% 3.5%;
+    --foreground: 214 22% 92%;
+    --card: 220 26% 6%;
+    --card-foreground: 214 22% 92%;
+    --popover: 220 26% 6%;
+    --popover-foreground: 214 22% 92%;
+    --primary: 199 100% 65%;
+    --primary-foreground: 222 32% 5%;
+    --secondary: 220 20% 12%;
+    --secondary-foreground: 214 22% 92%;
+    --muted: 220 20% 12%;
+    --muted-foreground: 215 14% 60%;
+    --accent: 199 100% 65%;
+    --accent-foreground: 222 32% 5%;
+    --destructive: 0 72% 58%;
+    --destructive-foreground: 214 22% 96%;
+    --border: 216 20% 16%;
+    --input: 216 20% 16%;
+    --ring: 199 100% 65%;
+    --radius: 0.375rem;
+
+    /* ---- HUD design tokens ------------------------------------------- */
+    /* Each colour is declared twice: as `r g b` channels, which Tailwind
+       needs so that opacity modifiers (bg-hud/10) resolve, and as a hex
+       value for use inside plain CSS rules and gradients. */
+
+    /* Surfaces, darkest to lightest, for tonal section rhythm. */
+    --void-rgb: 5 7 12;
+    --deep-rgb: 8 11 18;
+    --panel-rgb: 12 16 24;
+    --raised-rgb: 17 23 34;
+    --void: #05070c;
+    --deep: #080b12;
+    --panel: #0c1018;
+    --raised: #111722;
+
+    /* Type */
+    --ink-rgb: 231 236 244;
+    --ink-dim-rgb: 148 160 180;
+    --ink-mute-rgb: 93 104 120;
+    --ink: #e7ecf4;
+    --ink-dim: #94a0b4;
+    --ink-mute: #5d6878;
+
+    /* Cool blue / cyan accent scale */
+    --accent-core-rgb: 77 184 255;
+    --accent-bright-rgb: 138 217 255;
+    --accent-deep-rgb: 26 111 158;
+    --accent-violet-rgb: 123 116 255;
+    --accent-core: #4db8ff;
+    --accent-bright: #8ad9ff;
+    --accent-deep: #1a6f9e;
+    --accent-violet: #7b74ff;
+
+    /* Lines + glow */
+    --hud-line: rgba(255, 255, 255, 0.07);
+    --hud-line-strong: rgba(255, 255, 255, 0.12);
+    --hud-accent-line: rgba(77, 184, 255, 0.28);
+    --hud-glow: rgba(77, 184, 255, 0.35);
   }
 }
 
@@ -35,12 +74,18 @@
   }
   body {
     @apply bg-background text-foreground;
+    background-color: var(--void);
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
   html {
     scroll-behavior: smooth;
+    background-color: var(--void);
+  }
+  ::selection {
+    background: var(--hud-glow);
+    color: #fff;
   }
 }
 
@@ -57,9 +102,14 @@
     line-height: 0.9;
     letter-spacing: -0.035em;
     white-space: nowrap;
-    color: #101012;
+    color: #f2f6fb;
     font-size: clamp(2.75rem, 6.5vw, 8.5rem);
     user-select: none;
+    /* Dark halo keeps the words readable where they overlap the portrait's
+       light pool; the faint blue bloom ties them to the accent system. */
+    text-shadow:
+      0 0 28px rgba(5, 7, 12, 0.85),
+      0 0 70px rgba(77, 184, 255, 0.18);
   }
 
   .hero-word-mobile {
@@ -69,19 +119,23 @@
     line-height: 0.92;
     letter-spacing: -0.03em;
     white-space: nowrap;
-    color: #101012;
+    color: #f2f6fb;
     font-size: clamp(2.75rem, 16vw, 4.75rem);
     user-select: none;
+    text-shadow:
+      0 0 24px rgba(5, 7, 12, 0.9),
+      0 0 60px rgba(77, 184, 255, 0.18);
   }
 
   .about-eyebrow {
     display: flex;
     align-items: center;
-    font-size: 12px;
-    font-weight: 600;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 11px;
+    font-weight: 500;
     text-transform: uppercase;
-    letter-spacing: 0.24em;
-    color: #86a5cc;
+    letter-spacing: 0.3em;
+    color: var(--accent-core);
   }
 
   .edu-year {
@@ -89,8 +143,235 @@
     font-weight: 700;
     letter-spacing: -0.02em;
     line-height: 1;
-    color: #f5f3ee;
+    color: var(--ink);
     font-size: clamp(2.25rem, 5vw, 4rem);
+  }
+
+  /* ===================== HUD SYSTEM ===================== */
+
+  .font-hud {
+    font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+  }
+
+  /* Small technical label: "SYSTEM ONLINE", "MISSION 01" */
+  .hud-label {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.28em;
+    color: var(--ink-mute);
+  }
+  .hud-label-accent {
+    color: var(--accent-core);
+  }
+
+  /* Section display heading */
+  .hud-display {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    line-height: 0.95;
+    letter-spacing: -0.03em;
+    color: var(--ink);
+    font-size: clamp(2.1rem, 5.2vw, 4.75rem);
+  }
+
+  /* Fine technical grid — the base atmosphere layer */
+  .hud-grid {
+    background-image:
+      linear-gradient(to right, rgba(255, 255, 255, 0.5) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.5) 1px, transparent 1px);
+    background-size: 72px 72px;
+    opacity: 0.045;
+  }
+  .hud-grid-accent {
+    background-image:
+      linear-gradient(to right, var(--accent-core) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--accent-core) 1px, transparent 1px);
+    background-size: 72px 72px;
+    opacity: 0.07;
+  }
+
+  /* CRT scan lines — extremely subtle, never a texture people "see" first */
+  .hud-scanlines {
+    background-image: repeating-linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.05) 0px,
+      rgba(255, 255, 255, 0.05) 1px,
+      transparent 1px,
+      transparent 4px
+    );
+    opacity: 0.5;
+  }
+
+  /* Film grain — breaks up banding in the near-black gradients. Static SVG
+     noise, so it costs nothing at runtime. */
+  .hud-noise {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+    opacity: 0.05;
+    mix-blend-mode: overlay;
+  }
+
+  /* Glow seam that joins one section to the next */
+  .hud-seam {
+    background: linear-gradient(
+      to right,
+      transparent 0%,
+      var(--hud-accent-line) 22%,
+      var(--accent-core) 50%,
+      var(--hud-accent-line) 78%,
+      transparent 100%
+    );
+  }
+
+  /* Panel surface used by cards / terminals */
+  .hud-panel {
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.035) 0%,
+      rgba(255, 255, 255, 0.012) 100%
+    );
+    border: 1px solid var(--hud-line-strong);
+  }
+  .hud-panel-hover {
+    transition: border-color 0.35s ease, background-color 0.35s ease;
+  }
+  .hud-panel-hover:hover {
+    border-color: var(--hud-accent-line);
+    background-color: rgba(77, 184, 255, 0.04);
+  }
+
+  /* Corner brackets — the signature "targeting frame" motif */
+  .hud-corners::before,
+  .hud-corners::after {
+    content: '';
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    border-color: var(--hud-accent-line);
+    pointer-events: none;
+  }
+  .hud-corners::before {
+    top: -1px;
+    left: -1px;
+    border-top: 1px solid;
+    border-left: 1px solid;
+  }
+  .hud-corners::after {
+    bottom: -1px;
+    right: -1px;
+    border-bottom: 1px solid;
+    border-right: 1px solid;
+  }
+
+  /* Accent text glow for key numerals */
+  .hud-glow-text {
+    color: var(--accent-bright);
+    text-shadow: 0 0 18px rgba(77, 184, 255, 0.45);
+  }
+
+  /* Game-menu primary control */
+  .hud-btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    overflow: hidden;
+    padding: 0.95rem 1.75rem;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    color: #04070d;
+    background: var(--accent-core);
+    border: 1px solid var(--accent-bright);
+    box-shadow: 0 0 0 rgba(77, 184, 255, 0);
+    transition: box-shadow 0.4s ease, transform 0.3s ease, background-color 0.3s ease;
+  }
+  .hud-btn:hover {
+    transform: translateY(-2px);
+    background: var(--accent-bright);
+    box-shadow: 0 8px 34px -8px var(--hud-glow);
+  }
+  /* Hover light sweep */
+  .hud-btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      100deg,
+      transparent 20%,
+      rgba(255, 255, 255, 0.55) 50%,
+      transparent 80%
+    );
+    transform: translateX(-120%);
+    transition: transform 0.7s ease;
+  }
+  .hud-btn:hover::after {
+    transform: translateX(120%);
+  }
+
+  /* Game-menu secondary control — understated */
+  .hud-btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.95rem 1.75rem;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    color: var(--ink-dim);
+    border: 1px solid var(--hud-line-strong);
+    background: transparent;
+    transition: color 0.3s ease, border-color 0.3s ease, background-color 0.3s ease;
+  }
+  .hud-btn-ghost:hover {
+    color: var(--ink);
+    border-color: var(--hud-accent-line);
+    background: rgba(77, 184, 255, 0.05);
+  }
+
+  /* Thin animated data line (used sparingly as a divider accent) */
+  .hud-pulse {
+    animation: hud-pulse 3.5s ease-in-out infinite;
+  }
+  @keyframes hud-pulse {
+    0%,
+    100% {
+      opacity: 0.35;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+
+  /* Blinking status dot */
+  .hud-blink {
+    animation: hud-blink 2.4s step-end infinite;
+  }
+  @keyframes hud-blink {
+    0%,
+    60% {
+      opacity: 1;
+    }
+    61%,
+    100% {
+      opacity: 0.25;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hud-pulse,
+    .hud-blink {
+      animation: none;
+    }
+    .hud-btn::after {
+      display: none;
+    }
   }
 }
 

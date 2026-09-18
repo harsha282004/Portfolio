@@ -2,7 +2,8 @@
 
 import { Github, Linkedin, Mail, Phone, FileText } from 'lucide-react';
 import Reveal from './Reveal';
-import { identity, profile } from '@/lib/data/site';
+import { identity, profile, hud } from '@/lib/data/site';
+import { handleAnchorClick } from '@/lib/utils/scrollToAnchor';
 
 const LINKS = [
   { label: 'GitHub', href: profile.github, icon: Github, external: true },
@@ -13,32 +14,28 @@ const LINKS = [
 ];
 
 /**
- * Footer — the final frame of the portfolio. Minimal, dark (continues the
- * Contact section), with compact real links and a restrained copyright line.
+ * Footer — the closing status bar of the interface.
  */
 export default function Footer() {
-  const onAnchor = (e, href) => {
-    if (!href?.startsWith('#')) return;
-    const el = document.querySelector(href);
-    if (!el) return;
-    e.preventDefault();
-    if (typeof window !== 'undefined' && window.__lenis) {
-      window.__lenis.scrollTo(el, { offset: -80, duration: 1.2 });
-    } else {
-      el.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
   return (
-    <footer className="relative w-full bg-[#08080a] text-[#f5f3ee]">
-      <div className="mx-auto w-full max-w-[1400px] px-6 py-16 md:px-10 md:py-20">
+    <footer className="relative w-full overflow-hidden bg-deep">
+      <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-px hud-seam opacity-60" />
+      <div aria-hidden className="pointer-events-none absolute inset-0 hud-grid" />
+
+      <div className="relative mx-auto w-full max-w-[1400px] px-6 py-14 md:px-10 md:py-16">
         <Reveal>
           <div className="flex flex-col gap-10 md:flex-row md:items-end md:justify-between">
             <div>
-              <p className="font-display text-xl font-bold uppercase tracking-[0.16em]">
-                {identity.fullName}
-              </p>
-              <p className="mt-3 text-sm text-[#8f8f97] md:text-base">
+              <div className="flex items-center gap-2.5">
+                <span
+                  aria-hidden
+                  className="h-1.5 w-1.5 rounded-full bg-hud shadow-[0_0_10px_var(--hud-glow)]"
+                />
+                <p className="font-display text-xl font-bold uppercase tracking-[0.16em] text-ink">
+                  {identity.fullName}
+                </p>
+              </div>
+              <p className="mt-3 font-hud text-[12px] uppercase tracking-[0.14em] text-ink-dim md:text-[13px]">
                 {identity.headline}
               </p>
             </div>
@@ -46,17 +43,21 @@ export default function Footer() {
             <nav aria-label="Footer" className="flex flex-wrap gap-x-6 gap-y-3">
               {LINKS.map((l) => {
                 const ext = l.external
-                  ? { target: '_blank', rel: 'noopener noreferrer', 'aria-label': `${l.label} — opens in a new tab` }
+                  ? {
+                      target: '_blank',
+                      rel: 'noopener noreferrer',
+                      'aria-label': `${l.label} — opens in a new tab`,
+                    }
                   : {};
                 return (
                   <a
                     key={l.label}
                     href={l.href}
                     {...ext}
-                    onClick={l.anchor ? (e) => onAnchor(e, l.href) : undefined}
-                    className="group inline-flex items-center gap-2 text-[13px] font-medium uppercase tracking-[0.14em] text-[#9a9aa2] outline-none transition-colors duration-300 hover:text-white focus-visible:text-white"
+                    onClick={l.anchor ? (e) => handleAnchorClick(e, l.href) : undefined}
+                    className="group inline-flex items-center gap-2 font-hud text-[11px] font-medium uppercase tracking-[0.16em] text-ink-dim outline-none transition-colors duration-300 hover:text-hud-bright focus-visible:text-hud-bright"
                   >
-                    <l.icon className="h-4 w-4 text-[#6cb6e6]" aria-hidden />
+                    <l.icon className="h-4 w-4 text-hud" aria-hidden />
                     {l.label}
                   </a>
                 );
@@ -64,10 +65,11 @@ export default function Footer() {
             </nav>
           </div>
 
-          <div className="mt-12 flex flex-col gap-2 border-t border-white/10 pt-6 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-xs text-white/35">© 2026 {identity.fullName}</p>
-            <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-white/30">
-              Designed &amp; built by M Harshavardhana
+          <div className="mt-12 flex flex-col gap-2 border-t border-hud-line-strong pt-6 sm:flex-row sm:items-center sm:justify-between">
+            <p className="hud-label">© 2026 {identity.fullName}</p>
+            <p className="hud-label flex items-center gap-2">
+              <span className="h-1 w-1 rounded-full bg-hud hud-blink" aria-hidden />
+              {hud.status}
             </p>
           </div>
         </Reveal>
