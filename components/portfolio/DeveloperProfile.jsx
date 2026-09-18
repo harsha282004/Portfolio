@@ -1,131 +1,161 @@
 'use client';
 
+import { useRef, useState } from 'react';
+import { motion, useInView, useReducedMotion } from 'framer-motion';
 import { Github, ArrowUpRight, Linkedin, Mail, Phone } from 'lucide-react';
 import Reveal from './Reveal';
 import SectionShell from './hud/SectionShell';
 import HudHeading from './hud/HudHeading';
-import { ProjectLinks } from './projects/parts';
 import { developer } from '@/lib/data/site';
 
 const ICONS = { github: Github, linkedin: Linkedin, mail: Mail, phone: Phone };
 
+/** The repo slug exactly as it appears in its GitHub URL. */
+const slug = (href) => href.split('/').filter(Boolean).pop();
+
 /**
- * Developer Profile — DEVELOPER TERMINAL
- * A terminal-framed archive of the real repositories. No fabricated stars,
- * followers, commit counts, streaks or contribution graphs.
+ * Developer Profile — SOURCE CODE TERMINAL
+ * A visual terminal (it does not execute anything) listing the REAL
+ * repositories. Each entry is a link to GitHub; hovering/focusing one shows a
+ * preview. No fabricated stars, followers, commits or contribution graphs.
  */
 export default function DeveloperProfile() {
   const d = developer;
+  const termRef = useRef(null);
+  const reduced = useReducedMotion();
+  const inView = useInView(termRef, { once: true, amount: 0.3 });
+  const [sel, setSel] = useState(0);
+  const repo = d.repos[sel];
+  const user = `${d.github.username}@portfolio`;
+
+  // Lines "print" in sequence once the terminal is on screen.
+  let step = 0;
+  const line = () => ({
+    initial: reduced ? false : { opacity: 0, x: -6 },
+    animate: inView || reduced ? { opacity: 1, x: 0 } : undefined,
+    transition: { duration: 0.25, delay: 0.15 + 0.22 * step++ },
+  });
 
   return (
     <SectionShell id="github" surface="panel" grid="accent" scanlines glow="top">
-      <HudHeading
-        index="09"
-        label={d.eyebrow}
-        heading={d.heading}
-        supporting={d.supporting}
-      />
+      <HudHeading index="08" label={d.eyebrow} heading={d.heading} supporting={d.supporting} />
 
       {/* ---------- terminal window ---------- */}
       <Reveal delay={0.06} className="mt-10 md:mt-12">
-        <div className="hud-panel overflow-hidden">
+        <div ref={termRef} className="terminal hud-corners relative overflow-hidden">
           {/* title bar */}
-          <div className="flex items-center gap-3 border-b border-hud-line-strong bg-white/[0.02] px-4 py-3">
+          <div className="flex items-center gap-3 border-b border-hud-line-strong bg-white/[0.03] px-4 py-3">
             <span className="flex gap-1.5" aria-hidden>
               <span className="h-2.5 w-2.5 rounded-full bg-white/15" />
               <span className="h-2.5 w-2.5 rounded-full bg-white/15" />
               <span className="h-2.5 w-2.5 rounded-full bg-hud/70" />
             </span>
-            <span className="font-hud text-[11px] tracking-[0.16em] text-ink-mute">
-              github · session
+            <span className="truncate font-hud text-[11px] tracking-[0.12em] text-ink-mute">
+              {user}: ~/repositories
             </span>
-            <span className="ml-auto flex items-center gap-2">
-              <span className="h-1.5 w-1.5 rounded-full bg-hud hud-blink" />
-              <span className="hud-label">Connected</span>
+            <span className="ml-auto flex flex-none items-center gap-2">
+              <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-hud hud-blink" />
+              <span className="hud-label">Online</span>
             </span>
           </div>
 
-          {/* terminal body */}
-          <div className="px-4 py-5 md:px-6 md:py-6">
-            <p className="font-hud text-[13px] leading-relaxed md:text-sm">
-              <span className="text-hud">$</span>{' '}
-              <span className="text-ink-dim">whoami</span>
-            </p>
-            <p className="mt-1.5 font-hud text-[13px] text-ink md:text-sm">
-              @{d.github.username}
-            </p>
-
-            <p className="mt-4 font-hud text-[13px] leading-relaxed md:text-sm">
-              <span className="text-hud">$</span>{' '}
-              <span className="text-ink-dim">cat profile.url</span>
-            </p>
-            <p className="mt-1.5 break-all font-hud text-[13px] text-ink-dim md:text-sm">
-              {d.github.url}
-            </p>
-
-            <div className="mt-6 flex flex-wrap items-center gap-3">
+          <div className="relative px-4 py-5 font-hud text-[12px] leading-relaxed md:px-6 md:py-6 md:text-[13px]">
+            <motion.p {...line()}>
+              <Prompt user={user} /> system --status
+            </motion.p>
+            <motion.p {...line()} className="mt-1 pl-4 text-ink-dim">
+              <span className="text-emerald-300/90">●</span> ONLINE ·{' '}
               <a
                 href={d.github.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="View GitHub — opens in a new tab"
-                className="hud-btn"
+                className="text-hud-bright underline-offset-4 hover:underline"
               >
-                <Github className="h-4 w-4" aria-hidden />
-                View GitHub
-                <span className="sr-only">(opens in a new tab)</span>
+                github.com/{d.github.username}
+                <span className="sr-only"> (opens in a new tab)</span>
               </a>
-              <span className="font-hud text-[11px] text-ink-mute">
-                <span className="text-hud">$</span> <span className="hud-blink">_</span>
-              </span>
-            </div>
+            </motion.p>
+
+            <motion.p {...line()} className="mt-4">
+              <Prompt user={user} /> ls ./repositories
+            </motion.p>
+
+            <ul className="mt-2 space-y-1">
+              {d.repos.map((r, i) => {
+                const gh = r.links.find((l) => l.kind === 'github');
+                const on = i === sel;
+                return (
+                  <motion.li key={r.index} {...line()}>
+                    <a
+                      href={gh.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onMouseEnter={() => setSel(i)}
+                      onFocus={() => setSel(i)}
+                      data-active={on || undefined}
+                      className="terminal-row group grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-3 px-3 py-2.5 md:grid-cols-[auto_minmax(0,1fr)_minmax(0,0.8fr)_auto]"
+                    >
+                      <span className="text-hud">[{r.index}]</span>
+                      <span className="truncate font-semibold text-ink">{slug(gh.href)}</span>
+                      <span className="hidden truncate text-[11px] uppercase tracking-[0.12em] text-ink-mute md:block">
+                        {r.category}
+                      </span>
+                      <ArrowUpRight
+                        aria-hidden
+                        className="h-4 w-4 text-ink-mute transition-all group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-hud-bright group-data-[active]:text-hud-bright"
+                      />
+                      <span className="sr-only"> — {r.category}, opens on GitHub in a new tab</span>
+                    </a>
+                  </motion.li>
+                );
+              })}
+            </ul>
+
+            <motion.p {...line()} className="mt-4">
+              <Prompt user={user} /> select --repository{' '}
+              <span className="text-hud-bright">{slug(repo.links[0].href)}</span>
+              <span aria-hidden className="terminal-caret" />
+            </motion.p>
+
+            {/* preview of the highlighted repository */}
+            <motion.div {...line()} aria-live="polite" className="mt-3 border-l border-hud/50 pl-4">
+              <p className="text-[11px] uppercase tracking-[0.14em] text-hud/80">{repo.name}</p>
+              <p className="mt-1.5 max-w-3xl font-sans text-sm leading-relaxed text-ink-dim md:text-[15px]">
+                {repo.description}
+              </p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {repo.links.map((l) => (
+                  <a
+                    key={l.href}
+                    href={l.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 border border-hud-line-strong px-3 py-1.5 text-[11px] uppercase tracking-[0.14em] text-ink-dim transition-colors hover:border-hud hover:text-ink"
+                  >
+                    {l.kind === 'github' ? <Github className="h-3.5 w-3.5" aria-hidden /> : <ArrowUpRight className="h-3.5 w-3.5" aria-hidden />}
+                    {l.label}
+                    <span className="sr-only"> (opens in a new tab)</span>
+                  </a>
+                ))}
+              </div>
+            </motion.div>
           </div>
         </div>
       </Reveal>
 
-      {/* ---------- repository archive ---------- */}
-      <div className="mt-10 md:mt-14">
-        <Reveal className="hud-label flex items-center gap-3">
-          <span aria-hidden className="h-px w-6 bg-hud opacity-60" />
-          Repository Archive
-        </Reveal>
-
-        <ol className="mt-6">
-          {d.repos.map((r, i) => (
-            <li key={r.index}>
-              <Reveal delay={0.05 * i}>
-                <div className="group relative border-t border-hud-line-strong py-8 transition-colors duration-300 last:border-b hover:bg-hud/[0.035] md:py-10">
-                  <span
-                    aria-hidden
-                    className="absolute left-0 top-0 h-full w-px origin-top scale-y-0 bg-hud shadow-[0_0_12px_var(--hud-glow)] transition-transform duration-500 group-hover:scale-y-100"
-                  />
-                  <div className="flex items-start justify-between gap-6">
-                    <div className="min-w-0">
-                      <span className="font-hud text-sm text-hud">{r.index}</span>
-                      <h3 className="mt-3 font-display text-2xl font-bold uppercase leading-[0.98] tracking-tight text-ink transition-transform duration-300 group-hover:translate-x-1 md:text-4xl">
-                        {r.name}
-                      </h3>
-                      <p className="mt-3 font-hud text-[11px] uppercase tracking-[0.14em] text-ink-mute">
-                        {r.category}
-                      </p>
-                    </div>
-                    <ArrowUpRight
-                      className="h-6 w-6 flex-none text-ink-mute transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-hud-bright"
-                      aria-hidden
-                    />
-                  </div>
-                  <p className="mt-5 max-w-2xl text-[15px] leading-relaxed text-ink-dim md:text-base">
-                    {r.description}
-                  </p>
-                  <div className="mt-7">
-                    <ProjectLinks links={r.links} />
-                  </div>
-                </div>
-              </Reveal>
-            </li>
-          ))}
-        </ol>
-      </div>
+      <Reveal className="mt-6 flex flex-wrap items-center gap-4">
+        <a
+          href={d.github.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="View GitHub profile — opens in a new tab"
+          className="hud-btn"
+        >
+          <Github className="h-4 w-4" aria-hidden />
+          View GitHub
+        </a>
+        <span className="font-hud text-[11px] text-ink-mute">Select a repository to open it on GitHub.</span>
+      </Reveal>
 
       {/* ---------- connect ---------- */}
       <div className="mt-12 md:mt-16">
@@ -163,5 +193,15 @@ export default function DeveloperProfile() {
         </div>
       </div>
     </SectionShell>
+  );
+}
+
+function Prompt({ user }) {
+  return (
+    <>
+      <span className="text-emerald-300/90">{user}</span>
+      <span className="text-ink-mute">:</span>
+      <span className="text-hud">~$</span>
+    </>
   );
 }

@@ -2,8 +2,13 @@
 
 import { Fragment } from 'react';
 import Image from 'next/image';
-import { Github, ArrowUpRight, ChevronDown, Image as ImageIcon } from 'lucide-react';
-import Reveal from '../Reveal';
+import {
+  Github,
+  ArrowUpRight,
+  ArrowRight,
+  ChevronRight,
+  Image as ImageIcon,
+} from 'lucide-react';
 
 /* The interface is a single dark HUD theme now. `theme` is still accepted so
    callers can keep their existing props, but it no longer branches styling. */
@@ -64,54 +69,50 @@ export function ProjectImage({
   );
 }
 
-function Connector() {
+/** '1901 / 837' -> 2.271 (grid fr weight). */
+function aspectRatio(aspect) {
+  const [w, h] = aspect.split('/').map(Number);
+  return (w / h).toFixed(3);
+}
+
+/**
+ * ImageSequence — images shown as a left-to-right process (Before -> Change ->
+ * After). Column widths follow each image's native aspect ratio so all frames
+ * share one height without cropping; stacks with downward arrows on mobile.
+ */
+export function ImageSequence({ images, sizes = '(max-width: 640px) 100vw, 30vw' }) {
   return (
-    <div className="flex flex-col items-center py-1.5 text-hud" aria-hidden>
-      <span className="block h-5 w-px bg-current opacity-50" />
-      <ChevronDown className="-mt-1 h-4 w-4 opacity-70" />
+    <div
+      className="grid items-center gap-3 sm:[grid-template-columns:var(--seq-cols)]"
+      style={{ '--seq-cols': images.map((im) => `${aspectRatio(im.aspect)}fr`).join(' auto ') }}
+    >
+      {images.map((im, i) => (
+        <Fragment key={im.label}>
+          {i > 0 && (
+            <ArrowRight aria-hidden className="mx-auto h-4 w-4 rotate-90 text-hud opacity-70 sm:rotate-0" />
+          )}
+          <ProjectImage src={im.src} label={im.label} alt={im.alt} aspect={im.aspect} sizes={sizes} />
+        </Fragment>
+      ))}
     </div>
   );
 }
 
-/**
- * Pipeline — vertical technical flow. Optional `inputs` render as a merged
- * header that feeds into `steps`.
- */
-export function Pipeline({ inputs, steps }) {
-  const Node = ({ children }) => (
-    <div className="hud-panel min-w-[220px] px-5 py-3 text-center font-hud text-[11px] font-semibold uppercase tracking-[0.14em] text-ink md:text-xs">
-      {children}
-    </div>
-  );
+/** FlowSteps — a compact horizontal pipeline (wraps on narrow screens). */
+export function FlowSteps({ steps, label }) {
   return (
-    <div className="mx-auto flex w-full max-w-md flex-col items-center">
-      {inputs?.length > 0 && (
-        <>
-          <Reveal className="flex flex-wrap items-center justify-center gap-2">
-            {inputs.map((x, i) => (
-              <Fragment key={x}>
-                {i > 0 && (
-                  <span className="px-1 text-sm text-hud" aria-hidden>
-                    +
-                  </span>
-                )}
-                <span className="border border-hud-line-strong px-3 py-1 font-hud text-[10px] font-semibold uppercase tracking-[0.12em] text-ink-mute">
-                  {x}
-                </span>
-              </Fragment>
-            ))}
-          </Reveal>
-          <Connector />
-        </>
-      )}
-      {steps.map((s, i) => (
-        <Fragment key={s}>
-          {i > 0 && <Connector />}
-          <Reveal delay={i * 0.05} className="flex w-full justify-center">
-            <Node>{s}</Node>
-          </Reveal>
-        </Fragment>
-      ))}
+    <div>
+      {label && <p className="hud-label">{label}</p>}
+      <ol className="mt-4 flex flex-wrap items-center gap-x-2 gap-y-2.5">
+        {steps.map((s, i) => (
+          <li key={s} className="flex items-center gap-2">
+            {i > 0 && <ChevronRight aria-hidden className="h-3.5 w-3.5 flex-none text-hud opacity-70" />}
+            <span className="border border-hud/30 bg-hud/[0.06] px-2.5 py-1.5 font-hud text-[10px] font-semibold uppercase tracking-[0.12em] text-ink md:text-[11px]">
+              {s}
+            </span>
+          </li>
+        ))}
+      </ol>
     </div>
   );
 }

@@ -20,7 +20,7 @@ export default function Resume() {
       <div className="grid items-center gap-12 md:grid-cols-2 md:gap-20">
         {/* ---------- left: statement + actions ---------- */}
         <div>
-          <HudHeading index="10" label={r.eyebrow} heading={r.heading} supporting={r.supporting} />
+          <HudHeading index="09" label={r.eyebrow} heading={r.heading} supporting={r.supporting} />
 
           {profile.resumeAvailable ? (
             <Reveal delay={0.18} className="mt-10 flex flex-wrap gap-3">

@@ -22,6 +22,9 @@ export default function SectionShell({
   scanlines = false,
   seam = true,
   glow = null, // 'top' | 'center' | null
+  // 'clip' keeps decorative layers contained without creating a scroll
+  // container, so `position: sticky` children keep working.
+  overflow = 'hidden', // 'hidden' | 'clip'
   className = '',
   innerClassName = '',
   children,
@@ -29,7 +32,7 @@ export default function SectionShell({
   return (
     <section
       id={id}
-      className={`relative w-full overflow-hidden ${className}`}
+      className={`relative w-full ${overflow === 'clip' ? 'overflow-x-clip' : 'overflow-hidden'} ${className}`}
       style={{ backgroundColor: SURFACE[surface] || SURFACE.void }}
     >
       {/* Glow seam joining the previous section */}

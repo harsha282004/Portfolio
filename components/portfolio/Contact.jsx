@@ -63,7 +63,7 @@ export default function Contact() {
       <div className="grid gap-12 md:grid-cols-2 md:gap-20">
         {/* ---------- left: statement + channels ---------- */}
         <div>
-          <HudHeading index="11" label={c.eyebrow} heading={c.heading} supporting={c.supporting} />
+          <HudHeading index="10" label={c.eyebrow} heading={c.heading} supporting={c.supporting} />
 
           <div className="mt-10 grid grid-cols-1 gap-3 sm:grid-cols-2">
             {CONTACTS.map((item, i) => {

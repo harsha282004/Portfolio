@@ -63,6 +63,13 @@ export default function Navbar() {
           : 'border-b border-transparent bg-transparent'
       }`}
     >
+      {/* HUD accent: a short lit segment on the header rule once scrolled */}
+      <span
+        aria-hidden
+        className={`pointer-events-none absolute bottom-[-1px] left-1/2 h-px w-40 -translate-x-1/2 hud-seam transition-opacity duration-500 ${
+          scrolled ? 'opacity-100' : 'opacity-0'
+        }`}
+      />
       <nav className="mx-auto flex h-16 w-full max-w-[1400px] items-center justify-between px-6 md:h-20 md:px-10">
         <a
           href="#top"
@@ -78,9 +85,10 @@ export default function Navbar() {
           </span>
         </a>
 
-        {/* Desktop links */}
-        <div className="hidden items-center gap-8 lg:flex">
-          <ul className="flex items-center gap-7">
+        {/* Desktop links — game-menu style: the selected item carries a
+            bracketed cursor that glides between entries. */}
+        <div className="hidden items-center gap-6 lg:flex">
+          <ul className="flex items-center gap-1">
             {navItems.map((item) => {
               const active = activeHref === item.href;
               return (
@@ -89,16 +97,25 @@ export default function Navbar() {
                     href={item.href}
                     onClick={(e) => handleNav(e, item.href)}
                     aria-current={active ? 'true' : undefined}
-                    className={`group relative font-hud text-[11px] font-medium uppercase tracking-[0.22em] transition-colors ${
+                    className={`group relative flex items-center px-3.5 py-2 font-hud text-[11px] font-medium uppercase tracking-[0.22em] transition-colors ${
                       active ? 'text-hud-bright' : 'text-ink-dim hover:text-ink'
                     }`}
                   >
-                    {item.label}
+                    {active && (
+                      <motion.span
+                        layoutId="nav-cursor"
+                        aria-hidden
+                        transition={{ type: 'spring', stiffness: 380, damping: 32 }}
+                        className="hud-corners absolute inset-0 bg-hud/[0.07] shadow-[inset_0_-1px_0_rgba(77,184,255,0.55)]"
+                      />
+                    )}
                     <span
-                      className={`absolute -bottom-1.5 left-0 h-px bg-hud transition-all duration-300 ${
-                        active ? 'w-full' : 'w-0 group-hover:w-full'
+                      aria-hidden
+                      className={`absolute left-1 top-1/2 h-1 w-1 -translate-y-1/2 rotate-45 bg-hud transition-opacity duration-300 ${
+                        active ? 'opacity-100' : 'opacity-0 group-hover:opacity-60'
                       }`}
                     />
+                    <span className="relative">{item.label}</span>
                   </a>
                 </li>
               );
@@ -107,7 +124,7 @@ export default function Navbar() {
           <a
             href="#contact"
             onClick={(e) => handleNav(e, '#contact')}
-            className="border border-hud-line-strong px-5 py-2 font-hud text-[11px] font-semibold uppercase tracking-[0.2em] text-ink-dim transition-all duration-300 hover:border-hud hover:bg-hud/10 hover:text-hud-bright"
+            className="hud-sweep border border-hud-line-strong px-5 py-2 font-hud text-[11px] font-semibold uppercase tracking-[0.2em] text-ink-dim transition-all duration-300 hover:border-hud hover:bg-hud/10 hover:text-hud-bright"
           >
             Let&apos;s talk
           </a>
